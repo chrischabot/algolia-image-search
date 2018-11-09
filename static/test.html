@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <!--Import Google Icon Font-->
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+   <!-- Import Materialize CSS to provide minimal UI functionality, see https://materializecss.com -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+   <!-- Import Algolia Search -->
+   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+   <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js"></script>
+
+   <!-- Set viewport -->
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+   <div class="container">
+      <div class="row">
+         <div class="input-field col s12">
+            <form class="col s12">
+               <input placeholder="Search images" id="search" type="text" class="validate">
+            </form>
+         </div>
+      </div>
+      <div style="position: absolute; bottom: 26px; right: 26px; z-index: 10">
+         <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+      </div>
+   </div>
+
+   <script>
+      var client = algoliasearch('HO6Z8L8O71', 'f75e2ad28e07f9050b67015b44372870')
+      var index = client.initIndex('algolia_image_search');
+      autocomplete('#search', {
+         hint: false
+      }, [{
+         source: autocomplete.sources.hits(index, {
+            hitsPerPage: 5
+         }),
+         displayKey: 'objectID',
+         templates: {
+            suggestion: function(suggestion) {
+               console.log(suggestion);
+               //return suggestion._highlightResult.objectID.value;
+               return '<em>be</em>ar';
+            }
+         }
+      }]).on('autocomplete:selected', function(event, suggestion, dataset) {
+         console.log(suggestion, dataset);
+      });
+   </script>
+</body>
+
+</html>

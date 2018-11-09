@@ -1,0 +1,24 @@
+{
+  "name": "algolia-image-search",
+  "version": "0.1.0",
+  "description": "Sample app demonstrating how to integrate Google's Vision API with Algolia",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://github.com/chrischabot/algolia-image-search",
+  "repository": {
+    "type" : "git",
+    "url": "https://github.com/chrischabot/algolia-image-search.git",
+  },
+  "author": "Chris Chabot <chabotc@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@google-cloud/vision": "^0.23.0",
+    "algoliasearch": "^3.30.0",
+    "express": "^4.16.4",
+    "sharp": "^0.21.0",
+    "sqlite3": "^4.0.3",
+    "unique-filename": "^1.1.1"
+  }
+}

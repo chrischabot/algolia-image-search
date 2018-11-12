@@ -24,6 +24,7 @@ var algoliaIndex = algoliaClient.initIndex('algolia_image_search');
 // Path to which resized image + thumbnail are saved
 const imagePath = './static/images/';
 
+
 module.exports = {
   process: processImage
 }
@@ -59,6 +60,7 @@ function resizeImage(fileName, cb) {
       .toFile(thumbName);
    sharp(inputBuffer)
       .resize(1280)
+      .max()
       .toFile(imageName);
    cb(imageID, fileName);
 }
@@ -67,8 +69,8 @@ function resizeImage(fileName, cb) {
 // Add all image information to the algolia search index
 function indexImage(imageID, labels, texts, landmarks, logos, fileName, cb) {
    algoliaIndex.addObject({
-      "objectID": imageID,
-      "_tags": labels,
+      "imageID": imageID,
+      "labels": labels,
       "fileName": baseName(fileName),
       "texts": texts,
       "landmarks": landmarks,
@@ -129,7 +131,11 @@ function annotateImage(fileName, cb) {
    visionClient.annotateImage(request).then((results) => {
       var labels = [];
       const labelsRes = results[0].labelAnnotations;
-      labelsRes.forEach(label => labels.push(label.description));
+      labelsRes.forEach(label => labels.push(label.description
+               .replace(',""','')
+               .replace("\'", "")
+               .replace("\'","")
+               .toLowerCase()));
 
       var texts = [];
       const textRes = results[0].textAnnotations;
@@ -145,10 +151,16 @@ function annotateImage(fileName, cb) {
 
       var webEntities = [];
       const webEntitiesRes = results[0].webDetection.webEntities;
-      webEntitiesRes.forEach(entity => webEntities.push(entity.description));
+      webEntitiesRes.forEach(entity => webEntities.push(entity.description
+               .replace(',""','')
+               .replace("\'", "")
+               .replace("\'","")
+               .toLowerCase()));
 
       // Merge EXIF web entities tags with the Vision API labels to simplify the data model as they're all image tags
       labels = labels.concat(webEntities);
+
+      // Convert textual labels to a format that's valid & easily matched in javascript
 
       cb(labels, texts.toString(), landmarks.toString(), logos.toString());
    });

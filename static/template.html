@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <!--Import Google Icon Font-->
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+   <!-- Import Algolia Search -->
+   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+   <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js"></script>
+
+   <!-- inline styling for the page -->
+   <style>
+   /* Page and image thumbnail styling */
+
+   body {
+      font-size: 14px;
+   }
+
+   #image-container {
+      margin-top: 68px;
+      text-align: center;
+      margin-left: 14px;
+   }
+
+   #image-container:after {
+     content: '';
+     display: block;
+     clear: both;
+   }
+
+   .image-sizer,
+   .image-thumb {
+     width: 320px;
+     height: 240px;
+     background-position: center center;
+     background-repeat: no-repeat;
+     background-size: cover;
+     margin-left: 4px;
+     margin-bottom: 4px;
+   }
+
+   .image-thumb {
+     float: left;
+   }
+
+   /* Search input and suggestion drop down styling */
+   .aa-input-container {
+      margin: auto;
+      width: 600px;
+      border: 1px solid #ccc;
+      box-shadow: 2px 2px 0px 0 rgba(0, 0, 0, 0.2);
+      z-index: 5;
+      position: fixed;
+      margin-left: auto;
+      margin-right: auto;
+      left: 0;
+      right: 0;
+      top: 10px;
+   }
+
+   .aa-input-search {
+      width: 600px;
+      border: 1px solid rgba(228, 228, 228, 0.6);
+      font-size: 14px;
+      padding: 12px 28px 12px 12px;
+      _box-sizing: border-box;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      outline: none;
+   }
+
+   .aa-input-search::-webkit-search-decoration, .aa-input-search::-webkit-search-cancel-button, .aa-input-search::-webkit-search-results-button, .aa-input-search::-webkit-search-results-decoration {
+      display: none;
+   }
+
+   .aa-dropdown-menu {
+      background-color: #fff;
+      border: 1px solid rgba(228, 228, 228, 0.6);
+      min-width: 600px;
+      margin-top: 10px;
+      box-sizing: border-box;
+   }
+
+   .aa-suggestion {
+      padding: 12px;
+      cursor: pointer;
+   }
+
+   .aa-suggestion+.aa-suggestion {
+      border-top: 1px solid rgba(228, 228, 228, 0.6);
+   }
+
+   .aa-suggestion:hover, .aa-suggestion.aa-cursor {
+      background-color: rgba(241, 241, 241, 0.35);
+   }
+
+   </style>
+
+   <!-- Set viewport -->
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+   <div class="container">
+      <div class="aa-input-container" id="aa-input-container">
+         <input type="search" id="search-input" class="aa-input-search" placeholder="Search images.." name="search" autocomplete="off" />
+      </div>
+         <div id="image-container">
+            {images}
+         </div>
+         <script>
+
+            // Hide all images that do not match the label suggestions
+            function filterGrid(labels) {
+               $("#image-container .image-thumb").hide();
+               $("#image-container .image-thumb").each((index, image) => {
+                  imageLabels = $(image).data('labels');
+                  labels.forEach((label) => {
+                     if (imageLabels.indexOf(label) != -1) {
+                        $(image).show();
+                     }
+                  });
+               });
+            }
+
+            // Setup Algolia search, and customize it to show labels array elements as the autocomplete
+            var client = algoliasearch('HO6Z8L8O71', 'f75e2ad28e07f9050b67015b44372870')
+            var index = client.initIndex('algolia_image_search');
+            $("#search-input").autocomplete({
+               hint: true
+            }, [{
+               source: function(q, cb) {
+                  index.search(q, {
+                     hitsPerPage: 100
+                  }, function(error, content) {
+                     if (error) {
+                        cb([]);
+                        return;
+                     }
+                     var ret = [];
+                     var hits = [];
+                     if (content.hits[0] != undefined) {
+                        content.hits.forEach((hit) => {
+                           hit._highlightResult.labels.forEach((label) => {
+                              // Check if this label matches the search string, and de-duplicate as multiple images will have the same label
+                              if (label.matchedWords.length > 0) {
+                                 var value = label.value.replace(/<(?:.|\n)*?>/gm, '').toLowerCase();
+                                 if (ret.indexOf(value) == -1) {
+                                    ret.push(value);
+                                 }
+                              }
+                           });
+                        });
+                     }
+                     filterGrid(ret);
+                     cb(ret);
+                  });
+               },
+               displayKey: "labels",
+               templates: {
+                  suggestion: function(suggestion) {
+                     return suggestion;
+                  }
+               }
+            }]).on('autocomplete:selected', function(event, suggestion, dataset) {
+               filterGrid([suggestion]);
+               $('#search-input').val(suggestion);
+            });
+
+            //
+            $('#search-input').on('input', function() {
+               if ($("#search-input").val() == "") {
+                  $("#image-container .image-thumb").show();
+               }
+            });
+
+         </script>
+</body>
+
+</html>

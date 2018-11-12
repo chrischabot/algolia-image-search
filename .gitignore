@@ -3,4 +3,5 @@ node_modules
 static/images/.DS_Store
 static/.DS_Store
 db/images.db
+static/images/*
 

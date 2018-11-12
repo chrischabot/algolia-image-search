@@ -1,4 +1,4 @@
-// Command line import tool to manually import 1 or multiple images
+   // Command line import tool to manually import 1 or multiple images
 //   # node import.js /path/to/image.jpg
 
 // To run, export the following environment variables to configure access for Google API's and Algolia

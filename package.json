@@ -8,8 +8,8 @@
   },
   "homepage": "https://github.com/chrischabot/algolia-image-search",
   "repository": {
-    "type" : "git",
-    "url": "https://github.com/chrischabot/algolia-image-search.git",
+    "type": "git",
+    "url": "https://github.com/chrischabot/algolia-image-search.git"
   },
   "author": "Chris Chabot <chabotc@gmail.com>",
   "license": "Apache-2.0",
@@ -17,8 +17,9 @@
     "@google-cloud/vision": "^0.23.0",
     "algoliasearch": "^3.30.0",
     "express": "^4.16.4",
+    "handlebars": "^4.0.12",
     "sharp": "^0.21.0",
     "sqlite3": "^4.0.3",
-    "unique-filename": "^1.1.1"
+    "uuid": "^3.3.2"
   }
 }
